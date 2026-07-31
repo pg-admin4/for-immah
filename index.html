@@ -194,6 +194,13 @@
             btn.classList.remove('bg-rose-400', 'hover:bg-rose-500');
             btn.classList.add('bg-rose-600');
             triggerOverload();
+
+            // Redirects to WhatsApp after 1.5 seconds with pre-filled text
+            setTimeout(() => {
+                const whatsappNumber = "254797161485";
+                const message = encodeURIComponent("I saw your message, Elton! ❤️");
+                window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`;
+            }, 1500);
         }
     </script>
 </body>
