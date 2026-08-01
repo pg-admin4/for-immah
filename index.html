@@ -3,246 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Church Sacrament Registry & PDF Generator</title>
-    
-    <!-- Google Fonts for Certificate Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@400;600&family=Pinyon+Script&display=swap" rel="stylesheet">
-    
-    <!-- html2pdf.js Bundle for PDF Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    <title>A Message For Immah</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f6f8;
-            padding: 30px;
-            color: #333;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #faf5f5;
+            color: #4a3e3d;
         }
-
-        .registry-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        .serif {
+            font-family: 'Playfair Display', serif;
         }
-
-        h2 {
-            margin-bottom: 20px;
-            color: #2c3e50;
+        /* Floating background animation */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background-color: #f8f9fa;
-            color: #555;
-        }
-
-        .btn-action {
-            background-color: #4a6fa5;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .btn-action:hover {
-            background-color: #3b5984;
-        }
-
-        /* HIDDEN OR OFF-SCREEN CERTIFICATE CONTAINER */
-        #certificate-wrapper {
-            display: none; /* Hidden until generated/downloaded */
-        }
-
-        /* CERTIFICATE STYLING (A4 LANDSCAPE FORMAT) */
-        .certificate-card {
-            width: 800px;
-            height: 560px;
-            padding: 40px;
-            background: #fffdf9;
-            border: 12px solid #8b6b32;
-            outline: 2px solid #b89759;
-            outline-offset: -8px;
-            box-sizing: border-box;
-            text-align: center;
-            position: relative;
-            margin: 0 auto;
-        }
-
-        .cert-header {
-            font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
-            color: #8b6b32;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .cert-sub {
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            color: #555;
-            margin-bottom: 25px;
-        }
-
-        .cert-title {
-            font-family: 'Cinzel', serif;
-            font-size: 2.4rem;
-            color: #1a1a1a;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .cert-text {
-            font-size: 1rem;
-            color: #444;
-            margin-bottom: 15px;
-        }
-
-        .cert-name {
-            font-family: 'Pinyon Script', cursive;
-            font-size: 3.5rem;
-            color: #8b6b32;
-            line-height: 1;
-            margin: 10px 0 20px 0;
-        }
-
-        .cert-details {
-            font-size: 0.95rem;
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 40px;
-        }
-
-        .cert-signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            padding: 0 50px;
-        }
-
-        .sig-box {
-            border-top: 1px solid #777;
-            width: 200px;
-            padding-top: 5px;
-            font-size: 0.85rem;
-            color: #555;
-        }
-
-        .cross-icon {
-            font-size: 1.8rem;
-            color: #8b6b32;
-            margin-bottom: 10px;
+        .floating-element {
+            position: fixed;
+            bottom: -50px;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+            z-index: 0;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen relative overflow-x-hidden flex flex-col items-center justify-start p-4 md:p-8">
 
-    <div class="registry-container">
-        <h2>Sacrament Registry Log</h2>
+    <!-- Dynamic Background Elements Container -->
+    <div id="bg-container"></div>
+
+    <main class="w-full max-w-md mx-auto relative z-10 my-8 space-y-8">
         
-        <table>
-            <thead>
-                <tr>
-                    <th>Reg No</th>
-                    <th>Full Name</th>
-                    <th>Sacrament</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>#SAC-2026-042</td>
-                    <td>Maria Angela Kirema</td>
-                    <td>Holy Baptism</td>
-                    <td>August 1, 2026</td>
-                    <td>
-                        <button class="btn-action" onclick="generatePDF('Maria Angela Kirema', 'Holy Baptism', 'August 1, 2026', 'Rev. Fr. Joseph')">
-                            📄 Download PDF
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- Header / Rose Section -->
+        <section class="text-center space-y-3">
+            <div class="text-5xl animate-bounce">🌹</div>
+            <p class="uppercase tracking-widest text-xs font-semibold text-rose-400">✦ A Message For You ✦</p>
+            <h1 id="recipient-name" class="serif text-4xl md:text-5xl font-normal text-slate-800 italic">Immah</h1>
+            <p class="text-sm text-gray-500 italic">"There are things I should have said sooner. This is my attempt."</p>
+            
+            <div class="pt-2">
+                <a href="#messages" class="inline-block px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-xs tracking-wider uppercase font-medium rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+                    Read My Heart ✨
+                </a>
+            </div>
+            
+            <!-- Live Timer -->
+            <div class="pt-4 text-xs tracking-wide text-gray-400 uppercase font-medium">
+                Seconds since I started missing you
+                <div id="timer" class="serif text-3xl text-rose-500 font-semibold mt-1">0</div>
+            </div>
+        </section>
 
-    <!-- CERTIFICATE TEMPLATE TO CONVERT TO PDF -->
-    <div id="certificate-wrapper">
-        <div class="certificate-card" id="certificate-content">
-            <div class="cross-icon">✝</div>
-            <div class="cert-header">St. Peter's Parish Registry</div>
-            <div class="cert-sub">Certificate of Sacrament</div>
-            
-            <div class="cert-title" id="certSacrament">Certificate of Baptism</div>
-            
-            <div class="cert-text">This is to certify that</div>
-            <div class="cert-name" id="certName">Name Here</div>
-            
-            <div class="cert-details">
-                has received the Holy Sacrament of <strong id="certSacramentDetail">Baptism</strong><br>
-                administered on <span id="certDate">Date</span> according to the rites of the Church.
+        <!-- Message Cards Section -->
+        <section id="messages" class="space-y-4 pt-4">
+            <!-- Card 1 -->
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl border border-rose-100 shadow-sm transition hover:shadow-md">
+                <p class="serif text-lg text-slate-700 italic mb-1">"You deserved better from me."</p>
+                <p class="text-xs text-gray-500">I shouldn't have made you feel upset. You deserve softness, always.</p>
             </div>
 
-            <div class="cert-signatures">
-                <div class="sig-box">
-                    <span id="certOfficiant">Parish Priest</span><br>
-                    <strong>Officiating Minister</strong>
+            <!-- Card 2 -->
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl border border-rose-100 shadow-sm transition hover:shadow-md">
+                <p class="serif text-lg text-slate-700 italic mb-1">"Even after every fight, my heart still chooses you."</p>
+                <p class="text-xs text-gray-500">Every single time. Without hesitation. Always you.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl border border-rose-100 shadow-sm transition hover:shadow-md">
+                <p class="serif text-lg text-slate-700 italic mb-1">"Please don't let this be our ending."</p>
+                <p class="text-xs text-gray-500">We are worth more than this silence. You know we are.</p>
+            </div>
+
+            <!-- Expandable Note Card -->
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl border border-rose-100 shadow-sm transition">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleNote()">
+                    <span class="text-xs font-semibold text-rose-500 tracking-wider uppercase">✦ One last thing from me... ✦</span>
+                    <span id="note-arrow" class="text-rose-400 text-sm transition-transform duration-300">▼</span>
                 </div>
-                <div class="sig-box">
-                    <strong>Parish Seal / Date</strong>
+                <div id="note-content" class="hidden mt-3 pt-3 border-t border-rose-50 text-xs text-gray-600 leading-relaxed">
+                    hey Immah, I am really in so much love with you. I am really sorry for making you upset at times, I will make up for it for sure. Love you a lot, we are in this together ❤️
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+
+        <!-- Interactive Forgiveness Meter Section -->
+        <section class="bg-white/90 backdrop-blur-sm p-6 rounded-3xl border border-rose-100 shadow-md text-center space-y-4">
+            <p class="uppercase tracking-widest text-[10px] font-semibold text-gray-400">✦ Completely Scientific ✦</p>
+            <h2 class="serif text-2xl font-medium text-slate-800">The Forgiveness Meter™</h2>
+            <p class="text-xs text-gray-500">Advanced AI is calculating exactly how much you deserve to be forgiven right now...</p>
+
+            <div id="meter-display" class="serif text-4xl font-bold text-rose-500 py-2">
+                0%
+            </div>
+
+            <div id="meter-status" class="text-xs text-gray-400 italic">
+                Scanning emotional wavelengths...
+            </div>
+
+            <button id="love-btn" onclick="triggerOverload()" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-xs font-semibold uppercase tracking-wider transition shadow-sm hover:shadow">
+                I LOVE YOU 💖
+            </button>
+        </section>
+
+        <!-- Final Message / Accordion -->
+        <section class="bg-white/90 backdrop-blur-sm p-8 rounded-3xl border border-rose-100 shadow-md text-center space-y-4">
+            <div class="text-3xl">🌹</div>
+            <h2 class="serif text-3xl font-medium text-slate-800">You are still my favourite</h2>
+            <p class="text-xs text-gray-500 italic max-w-xs mx-auto">
+                In every version of this life, in every universe that exists — I would still choose you.
+            </p>
+            <p class="text-xs text-gray-400 pt-2">— Elton</p>
+
+            <button onclick="acceptApology(this)" class="w-full py-3 bg-rose-400 hover:bg-rose-500 text-white rounded-2xl text-xs font-semibold uppercase tracking-wider transition shadow-sm flex items-center justify-center space-x-2">
+                <span>♡ ALWAYS MINE ♡</span>
+            </button>
+        </section>
+
+    </main>
 
     <script>
-        function generatePDF(name, sacrament, date, officiant) {
-            // 1. Populate the hidden HTML template with dynamic data
-            document.getElementById('certName').textContent = name;
-            document.getElementById('certSacrament').textContent = "Certificate of " + sacrament;
-            document.getElementById('certSacramentDetail').textContent = sacrament;
-            document.getElementById('certDate').textContent = date;
-            document.getElementById('certOfficiant').textContent = officiant;
+        // 1. Live Seconds Counter
+        let seconds = 0;
+        const timerEl = document.getElementById('timer');
+        setInterval(() => {
+            seconds++;
+            timerEl.textContent = seconds;
+        }, 1000);
 
-            // 2. Temporarily display the template for rendering
-            const element = document.getElementById('certificate-content');
-            const wrapper = document.getElementById('certificate-wrapper');
-            wrapper.style.display = 'block';
+        // 2. Dynamic Floating Background Elements (Petals/Hearts)
+        const bgContainer = document.getElementById('bg-container');
+        const icons = ['🌸', '💖', '✨', '🌹', '💕'];
+        
+        function createFloatingElement() {
+            const el = document.createElement('div');
+            el.className = 'floating-element';
+            el.innerText = icons[Math.floor(Math.random() * icons.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            el.style.fontSize = (Math.random() * 12 + 12) + 'px';
+            bgContainer.appendChild(el);
 
-            // 3. Configure PDF generation settings
-            const opt = {
-                margin:       0,
-                filename:     `${sacrament}_Certificate_${name.replace(/\s+/g, '_')}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // Higher resolution
-                jsPDF:        { unit: 'px', format: [800, 560], orientation: 'landscape' }
-            };
+            setTimeout(() => {
+                el.remove();
+            }, 10000);
+        }
+        setInterval(createFloatingElement, 800);
 
-            // 4. Generate PDF and hide wrapper once done
-            html2pdf().set(opt).from(element).save().then(() => {
-                wrapper.style.display = 'none';
-            });
+        // 3. Expandable Note Card Toggle
+        function toggleNote() {
+            const content = document.getElementById('note-content');
+            const arrow = document.getElementById('note-arrow');
+            content.classList.toggle('hidden');
+            arrow.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        // 4. Forgiveness Meter Animation Logic
+        let meterValue = 0;
+        const meterDisplay = document.getElementById('meter-display');
+        const meterStatus = document.getElementById('meter-status');
+
+        const meterInterval = setInterval(() => {
+            if (meterValue < 81) {
+                meterValue += 3;
+                meterDisplay.textContent = meterValue + '%';
+            } else {
+                clearInterval(meterInterval);
+                setTimeout(() => {
+                    meterDisplay.textContent = '???%';
+                    meterStatus.innerHTML = '<span class="text-rose-500 font-semibold">⚡ ERROR: TOO MUCH LOVE DETECTED</span>';
+                }, 800);
+            }
+        }, 100);
+
+        function triggerOverload() {
+            meterStatus.innerHTML = '<span class="text-rose-500 font-bold">✨ System Overload: Too much beauty detected. The universe cannot process this much cuteness. ✨</span>';
+            // Burst animation
+            for (let i = 0; i < 15; i++) {
+                setTimeout(createFloatingElement, i * 50);
+            }
+        }
+
+        function acceptApology(btn) {
+            btn.innerHTML = '<span>ALWAYS YOURS. ALWAYS. ❤️</span>';
+            btn.classList.remove('bg-rose-400', 'hover:bg-rose-500');
+            btn.classList.add('bg-rose-600');
+            triggerOverload();
+
+            // Redirects to WhatsApp after 1.5 seconds with pre-filled text
+            setTimeout(() => {
+                const whatsappNumber = "254797161485";
+                const message = encodeURIComponent("I saw your message, Elton! ❤️");
+                window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`;
+            }, 1500);
         }
     </script>
 </body>
